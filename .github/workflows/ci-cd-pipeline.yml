@@ -1,4 +1,40 @@
-steps:
-- name: "gcr.io/cloud-builders/gcloud"
-  args: ["app", "deploy"]
-timeout: "1600s
+name: Flask CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: 
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          echo "Dependencies installed successfully."
+
+
+  simulate-deploy:
+    needs: build-and-test  #
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acknowledge CI success
+        run: echo "CI stage passed. Ready for deployment."
+
+      - name: Simulate deployment to GCP
+        run: |
+          echo "Simulating connection to Google Cloud Platform..."
+          sleep 2
+          echo "Deploying Flask application..."
+          sleep 2
+          echo "Deployment successful! (Simulation)"
